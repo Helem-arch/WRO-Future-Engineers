@@ -8,12 +8,8 @@ cap = cv.VideoCapture(0)
 cap.set(3, 500)
 cap.set(4, 500)
 
-object_size = 200
-""" 
-[ 15 113 145] [ 35 133 225] - Y
-[  0 180 159] [  0 200 239] - O
-[101 177  73] [121 197 153] - B
-"""
+# For steering the vehicle
+object_size = int(cap.get(cv.CAP_PROP_FRAME_WIDTH)*0.3)
 
 while True:
     start = time.time()
@@ -45,26 +41,26 @@ while True:
     # Finding the contours and marking them
     contours1, _ = cv.findContours(mask1, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     for cnt in contours1:
-        if cv.contourArea(cnt) > 3000:
+        if cv.contourArea(cnt) > height*width*0.012:
             (cx, cy), radius = cv.minEnclosingCircle(cnt)
             x, y, w, h = cv.boundingRect(cnt)
             cv.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
             font = cv.FONT_HERSHEY_SIMPLEX
             cv.putText(img, "Yellow", (x, y), font, 0.5, (255, 255, 255), 2, cv.LINE_AA)
-            if x+w < (width // 2 - object_size // 2):
+            if cx  < (width // 2 - object_size // 2):
                 cv.line(img, (int(cx), 0), (int(cx), height), (0, 255, 0), 2)
             else:
                 cv.line(img, (int(cx), 0), (int(cx), height), (0, 0, 255), 2)
 
     contours2, _ = cv.findContours(mask2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     for cnt in contours2:
-        if cv.contourArea(cnt) > 3000:
+        if cv.contourArea(cnt) > height*width*0.012:
             (cx, cy), radius = cv.minEnclosingCircle(cnt)
             x, y, w, h = cv.boundingRect(cnt)
             cv.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
             font = cv.FONT_HERSHEY_SIMPLEX
             cv.putText(img, 'Orange', (x, y), font, 0.5, (255, 255, 255), 2, cv.LINE_AA)
-            if x > (width // 2 + object_size // 2):
+            if cx > (width // 2 + object_size // 2):
                 cv.line(img, (int(cx), 0), (int(cx), height), (0, 255, 0), 2)
             else:
                 cv.line(img, (int(cx), 0), (int(cx), height), (0, 0, 255), 2)
