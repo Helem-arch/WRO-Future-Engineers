@@ -8,8 +8,11 @@ cap = cv.VideoCapture(0)
 cap.set(3, 500)
 cap.set(4, 500)
 
-# For steering the vehicle
 object_size = int(cap.get(cv.CAP_PROP_FRAME_WIDTH)*0.3)
+px = 0.0264583333 # Pixel to cm conversion
+cam_distance = 18 # Approx 
+signal_size = 10 # Height of the traffic signal in cm
+weight = 5
 
 while True:
     start = time.time()
@@ -23,7 +26,7 @@ while True:
     upper_limit = np.array([35, 143, 225])
     mask1 = cv.inRange(hsv, lower_limit, upper_limit)
     kernel = np.ones((11, 11), np.uint8)
-    mask1 = cv.dilate(mask1, kernel, iterations=2)
+    mask1 = cv.dilate(mask1, kernel, iterations=1)
     mask1 = cv.erode(mask1, kernel, iterations=1)
 
     # Setting up the second mask
@@ -31,7 +34,7 @@ while True:
     upper_limit = np.array([10, 225, 225])
     mask2 = cv.inRange(hsv, lower_limit, upper_limit)
     kernel = np.ones((11, 11), np.uint8)
-    mask2 = cv.dilate(mask2, kernel, iterations=2)
+    mask2 = cv.dilate(mask2, kernel, iterations=1)
     mask2 = cv.erode(mask2, kernel, iterations=1)
 
     # Filtering the masks from the image
@@ -41,13 +44,15 @@ while True:
     # Finding the contours and marking them
     contours1, _ = cv.findContours(mask1, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     for cnt in contours1:
-        if cv.contourArea(cnt) > height*width*0.012:
+        if cv.contourArea(cnt) > height*width*0.002:
             (cx, cy), radius = cv.minEnclosingCircle(cnt)
             x, y, w, h = cv.boundingRect(cnt)
             cv.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
             font = cv.FONT_HERSHEY_SIMPLEX
             cv.putText(img, "Yellow", (x, y), font, 0.5, (255, 255, 255), 2, cv.LINE_AA)
-            if cx  < (width // 2 - object_size // 2):
+            distance = (18*signal_size/2)/(h*px*0.5) + weight
+            print("Yellow Object distance :", distance, "cm")
+            if cx < (width // 2 - object_size // 2):
                 cv.line(img, (int(cx), 0), (int(cx), height), (0, 255, 0), 2)
             else:
                 cv.line(img, (int(cx), 0), (int(cx), height), (0, 0, 255), 2)
@@ -59,7 +64,9 @@ while True:
             x, y, w, h = cv.boundingRect(cnt)
             cv.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
             font = cv.FONT_HERSHEY_SIMPLEX
-            cv.putText(img, 'Orange', (x, y), font, 0.5, (255, 255, 255), 2, cv.LINE_AA)
+            cv.putText(img, "Orange", (x, y), font, 0.5, (255, 255, 255), 2, cv.LINE_AA)
+            distance = (18 * signal_size/2) / (h * px * 0.5) + weight
+            print("Orange Object distance :", distance, "cm")
             if cx > (width // 2 + object_size // 2):
                 cv.line(img, (int(cx), 0), (int(cx), height), (0, 255, 0), 2)
             else:
@@ -72,6 +79,6 @@ while True:
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
     end = time.time()
-    print("Time taken for one frame :", end - start)
+
 
 cv.destroyAllWindows()
