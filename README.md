@@ -8,7 +8,7 @@ The other modules used include:
 1. Picamera and picamera.array module - Inorder to get the frame from the picamera
 2. Time - to get the time
 
-## Program fuctioning:
+## Program functioning:
 The program consists of a main "Game code" which runs the program, it also contains another file called "utlis" which contains all the functions used in the program. These both files have to be in the same directory for the program to work properly.
 
 The program loop goes as follows:
@@ -41,7 +41,7 @@ The program consists of three parts:
 4. The centre of the circle is used to approximate the position of the signal in real life
 5. The program then checks if the signal is in the correct direction and accordingly sends the signals to the motor controller for maneuvers.
 
-![Signal detection logic](https://user-images.githubusercontent.com/84518833/135411443-b7675760-dc7b-44e6-ab3b-a5271b646899.png)
+![Signal detection logic](https://user-images.githubusercontent.com/84518833/135608358-edd4c591-133e-42ac-88e2-22d7efcff02f.png)
 
 
 ### Wall Detection:
